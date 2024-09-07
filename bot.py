@@ -1,5 +1,5 @@
 ##t.me/SNtstbot
-token = '6803619652:AAGEIP2LPpF-UmPXdxqPFqezzn5fKzOxVas'
+
 
 
 import telebot
