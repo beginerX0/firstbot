@@ -6,15 +6,17 @@ import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 bot = telebot.TeleBot(token)
-
+#вопросы
 questions = {'name':'Введите ваше имя: ',
               'age':'Введите ваш возраст: ',
               'department':'На каком факультете вы учитесь?: ',
               'SoS':'Расскажите немного о себе: ',
               'photo': 'Загрузите фотографию'}
+#возможность пропуска вопроса
 propusk = [False,False,False,True,True]
+#словарь который отправится в бд
 setup_data=dict()
-f=False
+f=False#нужная для opr штука
 
 qamount = len(questions)
 cquestion = 0
