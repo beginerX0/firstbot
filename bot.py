@@ -1,22 +1,19 @@
 ##t.me/SNtstbot
 
 
-
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 bot = telebot.TeleBot(token)
-#вопросы
+
 questions = {'name':'Введите ваше имя: ',
               'age':'Введите ваш возраст: ',
               'department':'На каком факультете вы учитесь?: ',
               'SoS':'Расскажите немного о себе: ',
               'photo': 'Загрузите фотографию'}
-#возможность пропуска вопроса
 propusk = [False,False,False,True,True]
-#словарь который отправится в бд
 setup_data=dict()
-f=False#нужная для opr штука
+f=False
 
 qamount = len(questions)
 cquestion = 0
@@ -45,6 +42,7 @@ def opr(message):
                         else:bot.send_message(message.chat.id,questions.get(list(questions.keys())[cquestion-1]))
                     else:
                         cquestion=0
+##                        print('1 ',message.content_type)##
                         setup_data.update({'tgid':message.from_user.id,
                            'firstname':message.from_user.first_name,
                            'lastname':message.from_user.last_name})
@@ -54,14 +52,23 @@ def opr(message):
                     f = True
                     cquestion+=1
         else:bot.send_message(message.chat.id,questions.get(list(questions.keys())[cquestion-1]))
-        if(cquestion!=1)and(not f):setup_data.update({list(questions.keys())[cquestion-2]:message.text})
+        if(cquestion!=1)and(not f):
+##            print('2 ',message.content_type)##
+            setup_data.update({list(questions.keys())[cquestion-2]:message.text})
         bot.register_next_step_handler(message,opr)
         cquestion+=1
     elif(cquestion==qamount+1):
-        setup_data.update({list(questions.keys())[cquestion-2]:message.text})
+        if(message.content_type=='photo'):
+            file = bot.get_file(message.photo[-1].file_id)
+            photo=bot.download_file(file.file_path)
+            setup_data.update({list(questions.keys())[cquestion-2]:'photos/'+str(message.from_user.id)+'.jpg'})
+            with open('photos/'+str(message.from_user.id)+'.jpg','wb') as new_file:
+                new_file.write(photo)
+        else:setup_data.update({list(questions.keys())[cquestion-2]:message.text})
+        
         setup_data.update({'tgid':message.from_user.id,
-                           'firstname':message.from_user.first_name,
-                           'lastname':message.from_user.last_name})
+                        'firstname':message.from_user.first_name,
+                        'lastname':message.from_user.last_name})
         cquestion=0
         print(setup_data)##вместо вывода в оболочку должен быть метод переноса в БД
         bot.send_message(message.chat.id,"Спасибо! Ваша анкета сохранена")
@@ -83,5 +90,5 @@ def setup(message):
         setup_data=dict()
         bot.send_message(message.chat.id,"Здраствуйте")
         opr(message)
-
+    
 bot.infinity_polling()
